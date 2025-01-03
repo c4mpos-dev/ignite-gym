@@ -1,28 +1,42 @@
 import { useState } from "react";
-import { HStack, VStack } from "@gluestack-ui/themed";
+import { FlatList } from "react-native";
+import { Heading, HStack, Text, VStack } from "@gluestack-ui/themed";
 
 import { Group } from "@components/Group";
 import { HomeHeader } from "@components/HomeHeader";
+import { ExerciseCard } from "@components/ExerciseCard";
 
 export function Home(){
-    const [groupSelected, setGroupSelected] = useState("costa");
+    const [groups, setGroups] = useState(["Costas", "Bíceps", " Tríceps", "Ombro"]);
+    const [groupSelected, setGroupSelected] = useState("Costas");
 
     return(
         <VStack flex={1}>
             <HomeHeader />
-            <HStack>
-                <Group 
-                    name="Costas" 
-                    isActive={groupSelected === "costa"} 
-                    onPress={() => setGroupSelected("costa")}
-                />
+            <FlatList 
+                data={groups}
+                keyExtractor={item => item}
+                renderItem={({ item }) => (
+                    <Group 
+                        name={item}
+                        isActive={groupSelected === item} 
+                        onPress={() => setGroupSelected(item)}
+                    />
+                )}
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={{ paddingHorizontal: 32 }}
+                style={{ marginVertical: 40, maxHeight: 44, minHeight: 44 }}
+            />
 
-                <Group 
-                    name="Ombro" 
-                    isActive={groupSelected === "ombro"} 
-                    onPress={() => setGroupSelected("ombro")}
-                />
-            </HStack>
+            <VStack px="$8">
+                <HStack justifyContent="space-between" mb="$5" alignItems="center">
+                    <Heading color="$gray200" fontSize="$md" fontFamily="$heading">Exercícios</Heading>
+                    <Text color="$gray200" fontSize="$sm" fontFamily="$body">4</Text>
+                </HStack>
+
+                <ExerciseCard />
+            </VStack>
         </VStack>
     );
 }
