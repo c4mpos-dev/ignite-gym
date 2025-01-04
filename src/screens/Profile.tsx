@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { ScrollView, TouchableOpacity } from "react-native";
+import { Alert, ScrollView, TouchableOpacity } from "react-native";
 import { Center, VStack, Text, Heading } from "@gluestack-ui/themed";
 import * as ImagePicker from "expo-image-picker";
+import * as FileSystem from "expo-file-system";
 
 import { ScreenHeader } from "@components/ScreenHeader";
 import { UserPhoto } from "@components/UserPhoto";
@@ -12,16 +13,31 @@ export function Profile(){
     const [userPhoto, setUserPhoto] = useState("https://github.com/c4mpos-dev.png");
 
     async function handleUserPhotoSelect(){
-        const photoSelected = await ImagePicker.launchImageLibraryAsync({
-            mediaTypes: ['images'],
-            quality: 1,
-            aspect: [4, 4],
-            allowsEditing: true
-        });
+        try {
+            const photoSelected = await ImagePicker.launchImageLibraryAsync({
+                mediaTypes: ['images'],
+                quality: 1,
+                aspect: [4, 4],
+                allowsEditing: true
+            });
 
-        if(photoSelected.canceled) { return }
+            if(photoSelected.canceled) { return }
 
-        setUserPhoto(photoSelected.assets[0].uri);
+            const photoURI = photoSelected.assets[0].uri;
+
+            if (photoURI) { 
+                const photoInfo = await FileSystem.getInfoAsync(photoURI) as { size: number };
+
+                if (photoInfo.size && (photoInfo.size / 1024 / 1024) > 5){
+                    return Alert.alert("O tamanho dessa imagem é maior que 5MB.")
+                }
+
+                setUserPhoto(photoURI);
+            }
+        }
+        catch (error) {
+            console.log(error);
+        }
     }
 
     return(
