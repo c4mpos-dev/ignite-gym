@@ -41,7 +41,9 @@ export function SignUp(){
     }
 
     function handleSignUp({ name, email, password }: FormDataProps) {
-        fetch("http://192.168.18.1:3333/users", {
+        console.log({ name, email, password });
+
+        fetch("http://192.168.18.61:3333/users", {
             method: "POST",
             headers: {
                 "Accept": "application/json",
