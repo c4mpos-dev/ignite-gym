@@ -11,6 +11,7 @@ import Logo from "@assets/logo.svg";
 
 import { Input } from "@components/Input";
 import { Button } from "@components/Button";
+import { PanResponder } from "react-native";
 
 type FormDataProps = {
     name: string;
@@ -40,17 +41,18 @@ export function SignUp(){
         navigation.goBack();
     }
 
-    function handleSignUp({ name, email, password }: FormDataProps) {
-        console.log({ name, email, password });
-
-        fetch("http://192.168.18.61:3333/users", {
+    async function handleSignUp({ name, email, password }: FormDataProps) {
+        const response = await fetch("http://192.168.18.61:3333/users", {
             method: "POST",
             headers: {
                 "Accept": "application/json",
                 "Content-Type": "application/json",
             },
             body: JSON.stringify({ name, email, password })
-        });
+        })
+        
+        const data = await response.json();
+        console.log(data);
     }
 
     return (
