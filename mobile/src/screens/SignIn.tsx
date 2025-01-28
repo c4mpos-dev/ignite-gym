@@ -5,6 +5,8 @@ import { VStack, Image, Center, Text, Heading, ScrollView } from "@gluestack-ui/
 import { useNavigation } from "@react-navigation/native";
 import { AuthNavigatorRouthProps } from "@routes/auth.routes";
 
+import { useAuth } from "@hooks/useAuth";
+
 import BackgroundImg from "@assets/background.png";
 import Logo from "@assets/logo.svg";
 
@@ -17,6 +19,8 @@ type FormData = {
 }
 
 export function SignIn(){
+    const { signIn } = useAuth();
+
     const navigation = useNavigation<AuthNavigatorRouthProps>();
 
     const { control, handleSubmit, formState: { errors } } = useForm<FormData>();
@@ -25,8 +29,8 @@ export function SignIn(){
         navigation.navigate("signUp");
     }
 
-    function handleSignIn({ email, password }: FormData){
-        console.log(email, password);
+    async function handleSignIn({ email, password }: FormData){
+        await signIn(email, password);
     }
 
     return (
