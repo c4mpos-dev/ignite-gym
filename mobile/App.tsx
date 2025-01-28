@@ -5,6 +5,8 @@ import { config } from './config/gluestack-ui.config';
 
 import { Routes } from '@routes/index';
 
+import { AuthContext } from '@contexts/AuthContext';
+
 import { Loading } from '@components/Loading';
 
 export default function App() {
@@ -17,8 +19,14 @@ export default function App() {
           backgroundColor="transparent"
           translucent
         />
-
+      <AuthContext.Provider value={{
+        id: '1',
+        name: 'Caua',
+        email: 'Teste@gamail.com',
+        avatar: 'campos.png'
+      }}>
         { fontsLoaded ? <Routes/> : <Loading/> }
+      </AuthContext.Provider>
     </GluestackUIProvider>
   );
 }
