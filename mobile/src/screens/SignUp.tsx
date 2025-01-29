@@ -53,14 +53,17 @@ export function SignUp(){
             const isAppError = error instanceof AppError;
             const title = isAppError ? error.message : "Erro ao criar conta. Tente novamente mais tarde.";
 
-            toast.show({
-                placement: "top",
-                render: () => (
-                  <Toast backgroundColor='$red500' action="error" variant="outline" mt="$14">
-                    <ToastTitle  color="$white">{title}</ToastTitle>
-                  </Toast>
-                ),
-            });
+            if(!toast.isActive("error")) {
+                toast.show({
+                    id: "error",
+                    placement: "top",
+                    render: () => (
+                    <Toast backgroundColor='$red500' action="error" variant="outline" mt="$14">
+                        <ToastTitle  color="$white">{title}</ToastTitle>
+                    </Toast>
+                    ),
+                });
+            }
         }
     }
     

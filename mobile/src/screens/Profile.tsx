@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Alert, ScrollView, TouchableOpacity } from "react-native";
+import { ScrollView, TouchableOpacity } from "react-native";
 import { Center, VStack, Text, Heading, useToast } from "@gluestack-ui/themed";
 import * as ImagePicker from "expo-image-picker";
 import * as FileSystem from "expo-file-system";
@@ -96,5 +96,6 @@ export function Profile(){
                 </Center>
             </ScrollView>
         </VStack>
-    );
+    )
 }
+
