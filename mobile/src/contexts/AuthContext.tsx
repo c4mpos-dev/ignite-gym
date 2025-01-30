@@ -5,7 +5,6 @@ import { storageUserGet, storageUserSave, storageUserRemove } from "@storage/sto
 
 import { api } from "@services/api";
 import { UserDTO } from "@dtos/UserDTO";
-import { set } from "@gluestack-style/react";
 
 export type AuthContextDataProps = {
     user: UserDTO;
@@ -24,10 +23,9 @@ export function AuthContextProvider({ children }: AuthContextProviderProps){
     const [user, setUser] = useState<UserDTO>({} as UserDTO);
     const [isLoadingUserStorageData, setIsLoadingUserStorageData] = useState(true);
 
-
     async function userAndTokenUpdate(userData: UserDTO, token: string){
         api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-        setUser(user);
+        setUser(userData);
     }
 
     async function storageUserAndTokenSave(userData: UserDTO, token: string){
@@ -64,8 +62,9 @@ export function AuthContextProvider({ children }: AuthContextProviderProps){
     async function signOut(){
         try {
             setIsLoadingUserStorageData(true);
-            
+
             setUser({} as UserDTO);
+
             await storageUserRemove();
             await storageAuthTokenRemove();
 
