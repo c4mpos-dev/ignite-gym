@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { ScrollView, TouchableOpacity } from "react-native";
-import { useNavigation, useRoute } from "@react-navigation/native";
-import { VStack, Text, Icon, HStack, Heading, Box, ToastTitle, Toast, useToast } from "@gluestack-ui/themed";
+import { NavigationHelpersContext, useNavigation, useRoute } from "@react-navigation/native";
+import { VStack, Text, Icon, HStack, Heading, Box, ToastTitle, Toast, useToast, set } from "@gluestack-ui/themed";
 import { Image } from "expo-image";
 import { ArrowLeft } from "lucide-react-native";
 
@@ -23,6 +23,7 @@ type RoutsParamsProps = {
 }
 
 export function Exercise(){
+    const [sendingRegister, setSendingRegister] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [exercise, setExercise] = useState<ExerciseDTO>({} as ExerciseDTO);
     const navigation = useNavigation<AppNavigatorRoutesProps>();
@@ -64,6 +65,49 @@ export function Exercise(){
         }
     }
 
+    async function handleExerciseHistoryRegister() {
+        try {
+            setSendingRegister(true);
+
+            await api.post("/history", { exercise_id: exerciseId });
+
+            const title = "Parabéns! Exercício registrado com sucesso.";
+
+            if(!toast.isActive("success")) {
+                toast.show({
+                    id: "error",
+                    placement: "top",
+                    render: () => (
+                    <Toast backgroundColor='$green700' action="success" variant="outline" mt="$14">
+                        <ToastTitle  color="$white">{title}</ToastTitle>
+                    </Toast>
+                    ),
+                });
+            }
+
+            navigation.navigate("history");
+
+        } catch (error) {
+            const isAppError = error instanceof AppError;
+            const title = isAppError ? error.message : "Erro ao registrar o exercício.";
+
+            if(!toast.isActive("error")) {
+                toast.show({
+                    id: "error",
+                    placement: "top",
+                    render: () => (
+                    <Toast backgroundColor='$red500' action="error" variant="outline" mt="$14">
+                        <ToastTitle  color="$white">{title}</ToastTitle>
+                    </Toast>
+                    ),
+                });
+            }
+        }
+        finally {
+            setSendingRegister(false);
+        }
+    }
+    
     useEffect(() => {
         fetchExerciseDetails();
     }, [exerciseId]);
@@ -114,7 +158,11 @@ export function Exercise(){
                                 </HStack>
                             </HStack>
 
-                            <Button title="Marcar como realizado"/>
+                            <Button 
+                                title="Marcar como realizado"
+                                isLoading={sendingRegister}
+                                onPress={handleExerciseHistoryRegister}
+                            />
                         </Box>
                     </VStack>
                 </ScrollView>
