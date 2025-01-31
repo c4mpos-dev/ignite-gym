@@ -1,17 +1,20 @@
 import { useState } from "react";
 import { ScrollView, TouchableOpacity } from "react-native";
-import { Center, VStack, Text, Heading, useToast, set, ToastTitle, Toast } from "@gluestack-ui/themed";
+import { Center, VStack, Text, Heading, useToast } from "@gluestack-ui/themed";
 import { Controller, useForm } from "react-hook-form";
 import * as ImagePicker from "expo-image-picker";
 import * as FileSystem from "expo-file-system";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup"
 
+import userPhotoDefault from "@assets/userPhotoDefault.png";
+
 import { ScreenHeader } from "@components/ScreenHeader";
 import { UserPhoto } from "@components/UserPhoto";
 import { Input } from "@components/Input";
 import { Button } from "@components/Button";
 import { ToastMessage } from "@components/ToastMessage";
+import { Loading } from "@components/Loading";
 
 import { useAuth } from "@hooks/useAuth";
 
@@ -38,7 +41,7 @@ const profileSchema = yup.object({
 
 export function Profile(){
     const [isUpdating, setIsUpdating] = useState(false);
-    const [userPhoto, setUserPhoto] = useState("https://github.com/c4mpos-dev.png");
+    const [photoIsLoading, setPhotoIsLoading] = useState(false);
 
     const toast = useToast();
     const { user, updateUserProfile } = useAuth();
@@ -51,6 +54,7 @@ export function Profile(){
     });
 
     async function handleUserPhotoSelect(){
+        setPhotoIsLoading(true);
         try {
             const photoSelected = await ImagePicker.launchImageLibraryAsync({
                 mediaTypes: ['images'],
@@ -81,11 +85,60 @@ export function Profile(){
                     })
                 }
 
-                setUserPhoto(photoURI);
+                const fileExtension = photoURI.split(".").pop();
+
+                const photoFile = {
+                    name: `${user.name}.${fileExtension}`.toLowerCase(),
+                    uri: photoURI,
+                    type: `${photoSelected.assets[0].type}/${fileExtension}`
+                } as any;
+
+                const userPhotoUploadForm = new FormData();
+                userPhotoUploadForm.append("avatar", photoFile);
+
+                const avatarUpdatedResponse = await api.patch("/users/avatar", userPhotoUploadForm, {
+                    headers: {
+                        "Content-Type": "multipart/form-data"
+                    }
+                });
+
+                const userUpdated = user;
+                userUpdated.avatar = avatarUpdatedResponse.data.avatar;
+                updateUserProfile(userUpdated);
+
+                toast.show({
+                    placement: "top",
+                    render: ({ id }) => (
+                        <ToastMessage 
+                            id={id} 
+                            title="Foto de perfil atualizada!" 
+                            onClose={() => toast.close(id)}
+                            action="success"
+                            description="Sua foto de perfil foi atualizada com sucesso."
+                        />
+                    )
+                })
             }
         }
         catch (error) {
-            console.log(error);
+            const isAppError = error instanceof AppError;
+            const title = isAppError ? error.message : "Erro ao atualizar a foto de perfil.";
+
+            toast.show({
+                placement: "top",
+                render: ({ id }) => (
+                    <ToastMessage 
+                        id={id} 
+                        title={title} 
+                        onClose={() => toast.close(id)}
+                        action="error"
+                    />
+                )
+            });
+        
+        }
+        finally {
+            setPhotoIsLoading(false);
         }
     }
 
@@ -97,38 +150,35 @@ export function Profile(){
             userUpdated.name = data.name;
 
             await api.put("/users", data);
-
             await updateUserProfile(userUpdated);
             
-            const title = "Perfil atualizado com sucesso!";
-
-            if(!toast.isActive("success")) {
-                toast.show({
-                    id: "success",
-                    placement: "top",
-                    render: () => (
-                    <Toast backgroundColor='$green700' action="success" variant="outline" mt="$14">
-                        <ToastTitle  color="$white">{title}</ToastTitle>
-                    </Toast>
-                    ),
-                });
-            }
+            toast.show({
+                placement: "top",
+                render: ({ id }) => (
+                    <ToastMessage 
+                        id={id} 
+                        title="Perfil atualizado com sucesso!" 
+                        onClose={() => toast.close(id)}
+                        action="success"
+                    />
+                )
+            });
 
         } catch (error) {
             const isAppError = error instanceof AppError;
             const title = isAppError ? error.message : "Erro ao atualizar o perfil.";
 
-            if(!toast.isActive("error")) {
-                toast.show({
-                    id: "error",
-                    placement: "top",
-                    render: () => (
-                    <Toast backgroundColor='$red500' action="error" variant="outline" mt="$14">
-                        <ToastTitle  color="$white">{title}</ToastTitle>
-                    </Toast>
-                    ),
-                });
-            }
+            toast.show({
+                placement: "top",
+                render: ({ id }) => (
+                    <ToastMessage 
+                        id={id} 
+                        title={title}
+                        onClose={() => toast.close(id)}
+                        action="error"
+                    />
+                )
+            });
         }
         finally {
             setIsUpdating(false);
@@ -141,11 +191,17 @@ export function Profile(){
 
             <ScrollView contentContainerStyle={{ paddingBottom: 36 }} fadingEdgeLength={20}>
                 <Center mt="$6" px="$10">
-                    <UserPhoto 
-                        source={{ uri: userPhoto}} 
-                        alt="Foto do usuário"
-                        size="xl"
-                    />
+                    { photoIsLoading ? <Loading /> :
+                        <UserPhoto 
+                            source={ 
+                                user.avatar 
+                                ? { uri: `${api.defaults.baseURL}/avatar/${user.avatar}` } 
+                                : userPhotoDefault 
+                            } 
+                            alt="Foto do usuário"
+                            size="xl"
+                        />
+                    }
 
                     <TouchableOpacity onPress={handleUserPhotoSelect}>
                         <Text color="$green500" fontFamily="$heading" fontSize="$md" mt="$2" mb="$8">Alterar Foto</Text>
