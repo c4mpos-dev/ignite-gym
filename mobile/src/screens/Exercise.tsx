@@ -75,7 +75,7 @@ export function Exercise(){
 
             if(!toast.isActive("success")) {
                 toast.show({
-                    id: "error",
+                    id: "success",
                     placement: "top",
                     render: () => (
                     <Toast backgroundColor='$green700' action="success" variant="outline" mt="$14">

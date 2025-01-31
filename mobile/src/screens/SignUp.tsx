@@ -19,7 +19,6 @@ import { Button } from "@components/Button";
 
 import { useAuth } from "@hooks/useAuth";
 
-
 type FormDataProps = {
     name: string;
     email: string;
@@ -47,7 +46,6 @@ export function SignUp(){
     });
 
     const navigation = useNavigation<AuthNavigatorRouthProps>();
-    
 
     function handleGoBack(){
         navigation.goBack();

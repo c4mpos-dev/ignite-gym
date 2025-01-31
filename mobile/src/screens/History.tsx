@@ -35,7 +35,7 @@ export function History(){
                     placement: "top",
                     render: () => (
                     <Toast backgroundColor='$red500' action="error" variant="outline" mt="$14">
-                        <ToastTitle  color="$white">{title}</ToastTitle>
+                        <ToastTitle color="$white">{title}</ToastTitle>
                     </Toast>
                     ),
                 });
