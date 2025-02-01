@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { useNavigation } from "@react-navigation/native";
 
-import { VStack, Image, Center, Text, Heading, ScrollView, useToast, ToastTitle, Toast, set } from "@gluestack-ui/themed";
+import { VStack, Image, Center, Text, Heading, ScrollView, useToast } from "@gluestack-ui/themed";
 
 import { AuthNavigatorRouthProps } from "@routes/auth.routes";
 
@@ -13,9 +13,9 @@ import Logo from "@assets/logo.svg";
 
 import { Input } from "@components/Input";
 import { Button } from "@components/Button";
+import { ToastMessage } from "@components/ToastMessage";
 
 import { AppError } from "@utils/AppError";
-
 
 type FormData = {
     email: string;
@@ -46,17 +46,17 @@ export function SignIn(){
 
             setIsLoading(false);
 
-            if(!toast.isActive("error")) {
-                toast.show({
-                    id: "error",
-                    placement: "top",
-                    render: () => (
-                        <Toast backgroundColor='$red500' action="error" variant="outline" mt="$14">
-                            <ToastTitle  color="$white">{title}</ToastTitle>
-                        </Toast>
-                    ),
-                });
-            }
+            toast.show({
+                placement: "top",
+                render: ({ id }) => (
+                    <ToastMessage 
+                        id={id} 
+                        title={title}
+                        onClose={() => toast.close(id)}
+                        action="error"
+                    />
+                )
+            })
         }
     }
 

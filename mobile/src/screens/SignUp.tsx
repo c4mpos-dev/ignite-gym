@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { VStack, Image, Center, Text, Heading, ScrollView, useToast, Toast, ToastTitle } from "@gluestack-ui/themed";
+import { VStack, Image, Center, Text, Heading, ScrollView, useToast } from "@gluestack-ui/themed";
 import { useNavigation } from "@react-navigation/native";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup"
@@ -18,6 +18,7 @@ import { Input } from "@components/Input";
 import { Button } from "@components/Button";
 
 import { useAuth } from "@hooks/useAuth";
+import { ToastMessage } from "@components/ToastMessage";
 
 type FormDataProps = {
     name: string;
@@ -64,17 +65,17 @@ export function SignUp(){
             const isAppError = error instanceof AppError;
             const title = isAppError ? error.message : "Erro ao criar conta. Tente novamente mais tarde.";
 
-            if(!toast.isActive("error")) {
-                toast.show({
-                    id: "error",
-                    placement: "top",
-                    render: () => (
-                    <Toast backgroundColor='$red500' action="error" variant="outline" mt="$14">
-                        <ToastTitle  color="$white">{title}</ToastTitle>
-                    </Toast>
-                    ),
-                });
-            }
+            toast.show({
+                placement: "top",
+                render: ({ id }) => (
+                    <ToastMessage 
+                        id={id} 
+                        title={title}
+                        onClose={() => toast.close(id)}
+                        action="error"
+                    />
+                )
+            })
         }
     }
     

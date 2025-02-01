@@ -1,16 +1,17 @@
 import { useCallback, useState } from "react";
 import { SectionList } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
-import { Heading, Text, VStack, useToast, Toast, ToastTitle, set } from "@gluestack-ui/themed";
+import { Heading, Text, VStack, useToast } from "@gluestack-ui/themed";
 
 import { HistoryCard } from "@components/HistoryCard";
 import { ScreenHeader } from "@components/ScreenHeader";
+import { Loading } from "@components/Loading";
+import { ToastMessage } from "@components/ToastMessage";
 
 import { AppError } from "@utils/AppError";
 
 import { api } from "@services/api";
 import { HistoryByDayDTO } from "@dtos/HistoryByDayDTO";
-import { Loading } from "@components/Loading";
 
 export function History(){
     const [isLoading, setIsLoading] = useState(true);
@@ -29,17 +30,17 @@ export function History(){
             const isAppError = error instanceof AppError;
             const title = isAppError ? error.message : "Erro ao carregar o histórico.";
 
-            if(!toast.isActive("error")) {
-                toast.show({
-                    id: "error",
-                    placement: "top",
-                    render: () => (
-                    <Toast backgroundColor='$red500' action="error" variant="outline" mt="$14">
-                        <ToastTitle color="$white">{title}</ToastTitle>
-                    </Toast>
-                    ),
-                });
-            }
+            toast.show({
+                placement: "top",
+                render: ({ id }) => (
+                    <ToastMessage 
+                        id={id} 
+                        title={title}
+                        onClose={() => toast.close(id)}
+                        action="error"
+                    />
+                )
+            })
         }
         finally {
             setIsLoading(false);

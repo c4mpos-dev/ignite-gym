@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { FlatList } from "react-native";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
-import { Heading, HStack, Text, VStack, useToast, Toast, ToastTitle, set } from "@gluestack-ui/themed";
+import { Heading, HStack, Text, VStack, useToast } from "@gluestack-ui/themed";
 
 import { api } from "@services/api";
 import { ExerciseDTO } from "@dtos/ExerciseDTO";
@@ -12,6 +12,7 @@ import { Group } from "@components/Group";
 import { HomeHeader } from "@components/HomeHeader";
 import { ExerciseCard } from "@components/ExerciseCard";
 import { Loading } from "@components/Loading";
+import { ToastMessage } from "@components/ToastMessage";
 
 import { AppError } from "@utils/AppError";
 
@@ -39,17 +40,17 @@ export function Home(){
             const isAppError = error instanceof AppError;
             const title = isAppError ? error.message : "Erro ao buscar grupos musculares.";
 
-            if(!toast.isActive("error")) {
-                toast.show({
-                    id: "error",
-                    placement: "top",
-                    render: () => (
-                    <Toast backgroundColor='$red500' action="error" variant="outline" mt="$14">
-                        <ToastTitle  color="$white">{title}</ToastTitle>
-                    </Toast>
-                    ),
-                });
-            }
+            toast.show({
+                placement: "top",
+                render: ({ id }) => (
+                    <ToastMessage 
+                        id={id} 
+                        title={title}
+                        onClose={() => toast.close(id)}
+                        action="error"
+                    />
+                )
+            })
         }
         finally {
             setIsLoading(false);
@@ -66,17 +67,17 @@ export function Home(){
             const isAppError = error instanceof AppError;
             const title = isAppError ? error.message : "Erro ao carregar os exercícios.";
 
-            if(!toast.isActive("error")) {
-                toast.show({
-                    id: "error",
-                    placement: "top",
-                    render: () => (
-                    <Toast backgroundColor='$red500' action="error" variant="outline" mt="$14">
-                        <ToastTitle  color="$white">{title}</ToastTitle>
-                    </Toast>
-                    ),
-                });
-            }
+            toast.show({
+                placement: "top",
+                render: ({ id }) => (
+                    <ToastMessage 
+                        id={id} 
+                        title={title}
+                        onClose={() => toast.close(id)}
+                        action="error"
+                    />
+                )
+            })
         }
         finally {
             setIsLoading(false);

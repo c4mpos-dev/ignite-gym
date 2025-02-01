@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { ScrollView, TouchableOpacity } from "react-native";
 import { NavigationHelpersContext, useNavigation, useRoute } from "@react-navigation/native";
-import { VStack, Text, Icon, HStack, Heading, Box, ToastTitle, Toast, useToast, set } from "@gluestack-ui/themed";
+import { VStack, Text, Icon, HStack, Heading, Box, useToast} from "@gluestack-ui/themed";
 import { Image } from "expo-image";
 import { ArrowLeft } from "lucide-react-native";
 
@@ -17,6 +17,7 @@ import RepetitionsSvg from "@assets/repetitions.svg";
 
 import { Button } from "@components/Button";
 import { Loading } from "@components/Loading";
+import { ToastMessage } from "@components/ToastMessage";
 
 type RoutsParamsProps = {
     exerciseId: string;
@@ -48,17 +49,17 @@ export function Exercise(){
             const isAppError = error instanceof AppError;
             const title = isAppError ? error.message : "Erro ao carregar os detalhes do exercício.";
 
-            if(!toast.isActive("error")) {
-                toast.show({
-                    id: "error",
-                    placement: "top",
-                    render: () => (
-                    <Toast backgroundColor='$red500' action="error" variant="outline" mt="$14">
-                        <ToastTitle  color="$white">{title}</ToastTitle>
-                    </Toast>
-                    ),
-                });
-            }
+            toast.show({
+                placement: "top",
+                render: ({ id }) => (
+                    <ToastMessage 
+                        id={id} 
+                        title={title}
+                        onClose={() => toast.close(id)}
+                        action="error"
+                    />
+                )
+            })
         }
         finally {
             setIsLoading(false);
@@ -71,19 +72,17 @@ export function Exercise(){
 
             await api.post("/history", { exercise_id: exerciseId });
 
-            const title = "Parabéns! Exercício registrado com sucesso.";
-
-            if(!toast.isActive("success")) {
-                toast.show({
-                    id: "success",
-                    placement: "top",
-                    render: () => (
-                    <Toast backgroundColor='$green700' action="success" variant="outline" mt="$14">
-                        <ToastTitle  color="$white">{title}</ToastTitle>
-                    </Toast>
-                    ),
-                });
-            }
+            toast.show({
+                placement: "top",
+                render: ({ id }) => (
+                    <ToastMessage 
+                        id={id} 
+                        title="Parabéns! Exercício registrado com sucesso."
+                        onClose={() => toast.close(id)}
+                        action="success"
+                    />
+                )
+            })
 
             navigation.navigate("history");
 
@@ -91,17 +90,17 @@ export function Exercise(){
             const isAppError = error instanceof AppError;
             const title = isAppError ? error.message : "Erro ao registrar o exercício.";
 
-            if(!toast.isActive("error")) {
-                toast.show({
-                    id: "error",
-                    placement: "top",
-                    render: () => (
-                    <Toast backgroundColor='$red500' action="error" variant="outline" mt="$14">
-                        <ToastTitle  color="$white">{title}</ToastTitle>
-                    </Toast>
-                    ),
-                });
-            }
+            toast.show({
+                placement: "top",
+                render: ({ id }) => (
+                    <ToastMessage 
+                        id={id} 
+                        title={title}
+                        onClose={() => toast.close(id)}
+                        action="error"
+                    />
+                )
+            })
         }
         finally {
             setSendingRegister(false);
